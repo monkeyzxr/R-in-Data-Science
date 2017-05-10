@@ -88,7 +88,7 @@ plot(rules1)
 library("arulesViz", lib.loc="~/R/win-library/3.2")
 plot(rules1.sorted)
 plot(rules1)
-student.mat <- read.csv("C:/Users/Xiangru Zhou/Desktop/Assignment 1-Xiangru Zhou/student/student-mat.csv", sep=";")
+student.mat <- read.csv("C:/Users/Xiangru Zhou/Desktop/Project 1-Xiangru Zhou/student/student-mat.csv", sep=";")
 View(student.mat)
 myData_mat = student.mat
 dim(myData_mat)
