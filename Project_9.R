@@ -1,0 +1,122 @@
+crx_data <- read.csv("C:/CreditApproval/Credit Approval/crx_data.data", header=FALSE, na.strings="?")
+View(crx_data)
+myData = crx_data
+View(myData)
+summary(myData)
+myData = na.omit(myData)
+summary(myData)
+dim(myData)
+myData$V6 = NULL
+myData$V7 = NULL
+summary(myData)
+dim(myData)
+train = sample(1:653,460)
+logist.model = glm(V16~., data=myData, subset = train, family=binomial)
+summary(logist.model)
+logist.probs = predict(logist.model, newdata=myData[-train,], type="response")
+logist.pred = rep(0, 193)
+logist.pred[logist.probs > .5] = 1
+table(logist.pred, myData[-train, 14])
+mean(logist.pred == myData[-train, 14])
+table(logist.pred, myData[-train, 16])
+library("e1071", lib.loc="~/R/win-library/3.2")
+svm.lin = svm(V16~., data=myData[train,], kernel = "linear", cost=1, scale=FALSE)
+svm.lin.pred = predict(svm.lin,myData[-train,])
+table(svm.lin.pred,myData[-train,14])
+mean(svm.lin.pred == myData[-train,14])
+# e1071 has a built in tuning function which uses CV to find the best value for C ...
+tune.lin = tune(svm,V16~., data=myData[-train,], kernel="linear", ranges=list(cost = c(.001, .01, .1, 1, 5, 10, 100)))
+summary(tune.lin)
+bestmod.lin = tune.lin$best.model
+table(predict(bestmod.lin,myData[-train,]),myData[-train,14])
+mean(predict(bestmod.lin,myData[-train,]) == myData[-train,14])
+svm.nonlin_p = svm(V16~.,data=myData[train,],kernel="polynomial", gamma=1, cost=1)
+table(predict(svm.nonlin_p,myData[-train,]),myData[-train,1])
+mean(predict(svm.nonlin_p,myData[-train,]) == myData[-train,1])
+mean(predict(svm.nonlin_p,myData[-train,]) == myData[-train,14])
+svm.nonlin_p = svm(V16~.,data=myData[train,],kernel="polynomial", gamma=1, cost=1)
+table(predict(svm.nonlin_p,myData[-train,]),myData[-train,1])
+mean(predict(svm.nonlin_p,myData[-train,]) == myData[-train,14])
+library("randomForest", lib.loc="~/R/win-library/3.2")
+rf.model = randomForest(V16~., data=myData,subset=train,mtry=5)
+rf.model.pred = predict(rf.model,myData[-train,],type="class")
+table(rf.model.pred,myData[-train,14])
+mean(rf.model.pred == myData[-train,14])
+library("neuralnet", lib.loc="~/R/win-library/3.2")
+n <- names(myData[train,])
+f <- as.formula(paste("V16 ~", paste(n[!n %in% "V16"], collapse = " + ")))
+f
+nn <- neuralnet(f,data=myData[train,],hidden=c(10),linear.output=FALSE,  threshold = .01)
+# For Neural Net, we need to make all of the variables numeric - dummy variables for the factors
+nn_bandData = model.matrix(~., data=myData)[,-1]
+# The -1 tells R to do one dummy variable for a two-factor predictor
+nn_bandData = as.data.frame(nn_bandData)
+summary(nn_bandData)
+dim(nn_bandData)
+n <- names(nn_bandData[train,])
+f <- as.formula(paste("V16+ ~", paste(n[!n %in% "V16+"], collapse = " + ")))
+f <- as.formula(paste("V16+~", paste(n[!n %in% "V16+"], collapse = " + ")))
+summary(myData)
+nn_bandData = model.matrix(~., data=myData)[,-1]
+nn_bandData = as.data.frame(nn_bandData)
+summary(nn_bandData)
+dim(nn_bandData)
+n <- names(nn_bandData[train,])
+f <- as.formula(paste("V16+~", paste(n[!n %in% "V16+"], collapse = " + ")))
+f <- as.formula(paste("V16+ ~", paste(n[!n %in% "V16+ "], collapse = " + ")))
+f <- as.formula(paste("V16+ ~", paste(n[!n %in% "V16+"], collapse = " + ")))
+f <- as.formula(paste("V16+~", paste(n[!n %in% "V16+"], collapse = " + ")))
+f <- as.formula(paste("V16 ~", paste(n[!n %in% "V16+"], collapse = " + ")))
+f
+f <- as.formula(paste("V16 ~", paste(n[!n %in% "V16"], collapse = " + ")))
+nn_bandData = model.matrix(~., data=myData)[,-1]
+nn_bandData = as.data.frame(nn_bandData)
+summary(nn_bandData)
+dim(nn_bandData)
+n <- names(nn_bandData[train,])
+f <- as.formula(paste("V16 ~", paste(n[!n %in% "V16+"], collapse = " + ")))
+f
+nn <- neuralnet(f,data=nn_bandData[train,],hidden=c(20),linear.output=TRUE, act.fct = "logistic", threshold = .01)
+f <- as.formula(paste("V16 + ~", paste(n[!n %in% "V16+"], collapse = " + ")))
+f <- as.formula(paste("V16+ ~", paste(n[!n %in% "V16+"], collapse = " + ")))
+summary(myData)
+myData$V1 = as.numeric(myData$V1)
+summary(myData)
+myData$V1 = as.numeric(myData$V1)
+myData$V4 = as.numeric(myData$V4)
+myData$V5 = as.numeric(myData$V5)
+myData$V9 = as.numeric(myData$V9)
+myData$V10 = as.numeric(myData$V10)
+myData$V12 = as.numeric(myData$V12)
+myData$V13 = as.numeric(myData$V13)
+myData$V16 = as.numeric(myData$V16)
+summary(myData)
+n <- names(myData[train,])
+f <- as.formula(paste("V16 ~", paste(n[!n %in% "V16"], collapse = " + ")))
+f
+nn <- neuralnet(f,data=myData[train,],hidden=c(10),linear.output=FALSE,  threshold = .01)
+test_x = myData[-train,-14]
+pr.nn <- compute(nn,test_x)
+nn_pred = pr.nn$net.result
+summary(nn_bandPred)
+summary(nn_pred)
+dim(test_x)
+nn_pred_val = rep(0,193)
+nn_pred_val[nn_pred > .5] = 1
+table(nn_pred_val,scaled[-train,14])
+############
+################
+maxs <- apply(myData, 2, max)
+mins <- apply(myData, 2, min)
+scaled <- as.data.frame(scale(myData, center = mins, scale = maxs - mins))
+nn <- neuralnet(f,data=scaled[train,],hidden=c(10),linear.output=FALSE,  threshold = .01)
+scaled_x = scaled[-train,-14]
+pr.nn <- compute(nn,scaled_x)
+nn_pred = pr.nn$net.result
+summary(nn_pred)
+dim(test_x)
+nn_pred_val = rep(0,193)
+nn_pred_val[nn_pred > .5] = 1
+table(nn_pred_val,scaled[-train,14])
+mean(nn_pred_val== scaled[-train,14])
+savehistory("~/Desktop/Project/Project_9.R")
