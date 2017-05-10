@@ -1,4 +1,7 @@
 # R-in-Data-Science
+
+created by Xiangru Zhou
+
 This project is to solve statistical learning problems by using R language. These problems include linear regression, classification, resampling, model selection, nonlinear methods, tree-based methods, support vector machine, unsupervised learning.
 
 This project helps to learn the basics of statistical learning and gain experience applying various modeling techniques to data sets using the R language.
